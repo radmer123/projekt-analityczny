@@ -3,10 +3,10 @@ import json
 from airflow.hooks.base import BaseHook 
 
 def upsert_player_data(player_json):
-    import sqlite3
+    import sqlite3                       
     import pandas as pd
 
-# Fetch the connection object
+# Pobierz obiekt połączenia
     database_conn_id = 'analytics_database'
     connection = BaseHook.get_connection(database_conn_id)
     
@@ -16,11 +16,11 @@ def upsert_player_data(player_json):
 
         player_data = json.loads(player_json)
         
-        # Use a context manager for the SQLite connection
+        # Użyj menedżera kontekstu dla połączenia SQLite
         with sqlite3.connect(sqlite_db_path) as conn:
             cursor = conn.cursor()
 
-            # Insert each player record into the 'player' table
+            # Wstaw każdy rekord zawodnika do tabeli 'player'
             for player in player_data:
                 try:
                     cursor.execute("""
@@ -44,11 +44,9 @@ def upsert_player_data(player_json):
                         player['last_changed_date']
                     ))
                 except Exception as e:
-                    logging.error(
-                        f"Failed to insert player {player['player_id']}: {e}")
+                    logging.error(f"Nie udało się wstawić danych zawodnika {player['player_id']}: {e}")
                     raise
                     
     else:
-        logging.warning("No player data found.")
-        raise ValueError(
-            "No player data found. Task failed due to missing data.")
+        logging.warning("Nie znaleziono danych zawodnika.")
+        raise ValueError("Nie znaleziono danych gracza. Zadanie nie powiodło się z powodu braku danych.")

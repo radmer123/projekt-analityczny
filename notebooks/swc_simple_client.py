@@ -1,5 +1,5 @@
 import backoff
-import logging
+import logging 
 import httpx
 
 HEALTH_CHECK_ENDPOINT = "/"
@@ -8,10 +8,9 @@ LIST_PLAYERS_ENDPOINT = "/v0/players/"
 LIST_PERFORMANCES_ENDPOINT = "/v0/performances/"
 LIST_TEAMS_ENDPOINT = "/v0/teams/"
 LIST_WEEKS_ENDPOINT = "/v0/weeks/"
-GET_COUNTS_ENDPOINT = "/v0/counts/"
+GET_COUNTS_ENDPOINT = "/v0/counts/" 
 
-logger = logging.getLogger(__name__) 
-
+logger = logging.getLogger(__name__)
 @backoff.on_exception(
     wait_gen=backoff.expo, 
     exception=(httpx.RequestError, httpx.HTTPStatusError),  
@@ -20,24 +19,23 @@ logger = logging.getLogger(__name__)
 )
 def call_api_endpoint(
     base_url: str,
-    api_endpoint: str, 
+    api_endpoint: str,
     api_params: dict = None
 ) -> httpx.Response:
-
     try:
-        with httpx.Client(base_url=base_url) as client: 
+        with httpx.Client(base_url=base_url) as client:
             logger.debug(f"base_url: {base_url}, api_endpoint: {api_endpoint}")
             response = client.get(api_endpoint, params=api_params)
             response.raise_for_status()
-            logger.debug(f"Response JSON: {response.json()}")
+            logger.debug(f"Odpowiedź JSON: {response.json()}")
             return response
     except httpx.HTTPStatusError as e:
-        logger.error(f"HTTP status error occurred: {e.response.text}")
-        return httpx.Response(status_code=e.response.status_code, 
-                              content=b"API error")
+        logger.error(f"Wystąpił błąd stanu HTTP: {e.response.text}")
+        return httpx.Response(status_code=e.response.status_code,
+                             content="Błąd API".encode("utf-8"))
     except httpx.RequestError as e:
-        logger.error(f"Request error occurred: {str(e)}")
-        return httpx.Response(status_code=500, content=b"Network error")
+        logger.error(f"Wystąpił błąd żądania: {str(e)}")
+        return httpx.Response(status_code=500, content="Błąd sieci".encode("utf-8"))
     except Exception as e:
-        logger.error(f"Unexpected error occurred: {str(e)}")
-        return httpx.Response(status_code=500, content=b"Unexpected error")
+        logger.error(f"Wystąpił nieoczekiwany błąd: {str(e)}")
+        return httpx.Response(status_code=500, content="Nieoczekiwany błąd".encode("utf-8"))

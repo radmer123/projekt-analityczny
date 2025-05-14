@@ -1,9 +1,9 @@
-#these are overrides to the default docker compose
-x-airflow-common:
-  &airflow-common
-  environment:
-    &airflow-common-env
-    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+# przesłonięcia domyślnego pliku docker-compose
+x-airflow-common: 
+    &airflow-common 
+    environment:
+      &airflow-common-env
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
 
 services:
   airflow-webserver:
